@@ -12,7 +12,9 @@
 #include "vga.h"
 #include "vga-modes.h"
 
+#ifndef PICO9918_NO_CLOCKS
 #include "clocks.pio.h"
+#endif
 #include "tms9918.pio.h"
 
 #include "palette.h"
@@ -78,15 +80,18 @@
   // pin-mapping for gromclk and cpuclk changed in PCB v0.4
   // in order to have MODE and MODE1 sequential
 #if PCB_MINOR_VERSION < 4
+#ifndef PICO9918_NO_CLOCKS
 #define GPIO_GROMCL 29
 #define GPIO_CPUCL 23
+#endif /* ! PICO9918_NO_CLOCKS */
 #else
+#ifndef PICO9918_NO_CLOCKS
 #define GPIO_GROMCL 25
 #define GPIO_CPUCL 24
+#endif /* ! PICO9918_NO_CLOCKS */
 #define GPIO_RESET 23
 #define GPIO_MODE1 29
 #endif
-
 
 #define GPIO_CD_MASK (0xff << GPIO_CD7)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
@@ -132,7 +137,7 @@ inline static void updateTmsReadAhead()
 /*
  * update the interrupt output
  */
-inline static updateInterruptOutput(void)
+inline static void updateInterruptOutput(void)
 {
 #ifdef PICO9918_INT_ACTIVE_HIGH
   gpio_put(GPIO_INT, currentInt);
@@ -339,6 +344,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
 }
 
+#ifndef PICO9918_NO_CLOCKS
 /*
  * initialise a clock output using PIO
  */
@@ -366,6 +372,7 @@ uint initClock(uint gpio, float freqHz)
 
   return clkSm++;
 }
+#endif /* ! PICO9918_NO_CLOCKS */
 
 /*
  * Set up PIOs for TMS9918 <-> CPU interface
@@ -421,9 +428,11 @@ void proc1Entry()
 
   tmsPioInit();
 
+#ifndef PICO9918_NO_CLOCKS
   // set up the GROMCLK and CPUCLK signals
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+#endif
 
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();

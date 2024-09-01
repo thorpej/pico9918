@@ -46,6 +46,11 @@ else ()
   message("Using default active-low interrupt output")
 endif ()
 
+if (DEFINED PICO9918_NO_CLOCKS)
+  message("Disabling clock outputs per config file")
+  # Logic for handling this is in src/CMakeLists.txt.
+endif ()
+
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
 set(PICO_BOARD ${PICO9918_BOARD})
 

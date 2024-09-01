@@ -4,7 +4,15 @@ set(PROGRAM pico9918)
 
 add_executable(${PROGRAM})
 
-target_sources(${PROGRAM} PRIVATE main.c palette.c clocks.pio.h tms9918.pio.h)
+if (DEFINED PICO9918_NO_CLOCKS)
+  set(PICO9918_CLOCK_SOURCES "")
+  add_definitions(-DPICO9918_NO_CLOCKS)
+else ()
+  set(PICO9918_CLOCK_SOURCES "clocks.pio.h")
+endif ()
+
+target_sources(${PROGRAM} PRIVATE
+	main.c palette.c ${PICO9918_CLOCK_SOURCES} tms9918.pio.h)
 
 # generate image array source files from png images
 visrealm_generate_image_source_ram(${PROGRAM} splash res/splash.png )
