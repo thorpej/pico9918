@@ -39,6 +39,13 @@ else ()
   message("Using default PICO9918_VGA_RGB_PINS_START '${PICO9918_VGA_RGB_PINS_START}'")
 endif ()
 
+if (DEFINED PICO9918_INT_ACTIVE_HIGH)
+  message("Using active-high interrupt output from config file")
+  add_definitions(-DPICO9918_INT_ACTIVE_HIGH)
+else ()
+  message("Using default active-low interrupt output")
+endif ()
+
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
 set(PICO_BOARD ${PICO9918_BOARD})
 

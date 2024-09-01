@@ -130,6 +130,18 @@ inline static void updateTmsReadAhead()
 }
 
 /*
+ * update the interrupt output
+ */
+inline static updateInterruptOutput(void)
+{
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put(GPIO_INT, currentInt);
+#else
+  gpio_put(GPIO_INT, !currentInt);
+#endif
+}
+
+/*
  * handle interrupts from the TMS9918<->CPU interface
  */
 void  __not_in_flash_func(pio_irq_handler)()
@@ -143,7 +155,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     {
       vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
       currentInt = vrEmuTms9918InterruptStatusImpl();
-      gpio_put(GPIO_INT, !currentInt);
+      updateInterruptOutput();
     }
     else // write data
     {
@@ -167,7 +179,7 @@ void  __not_in_flash_func(pio_irq_handler)()
       currentStatus = 0x1f;
       vrEmuTms9918SetStatusImpl(currentStatus);
       currentInt = false;
-      gpio_put(GPIO_INT, !currentInt);
+      updateInterruptOutput();
     }
     updateTmsReadAhead();
   }
@@ -289,7 +301,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     updateTmsReadAhead();
 
     currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
+    updateInterruptOutput();
   }
   enableTmsPioInterrupts();
 
