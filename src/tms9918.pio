@@ -63,10 +63,13 @@ endPart:
 ;           
 ;            very simple grab the data and send it through...
 ;
+;                              GPIO
+;                            2      1
+;                            1      4
 ; fifo isr   0b|x|m|w|r|xxxx|dddddddd|
-;              | |o|r|e|    |  CD0-7 |
-;              | |d|i|a|    |        |
-;              | |e|t|d|    |        |
+;              | |o|r|e|    |0      7|
+;              | |d|i|a|    |   CD   |
+;              | |e|t|d|    |MSB  LSB|
 ;              | | |e| |    |        |
 
 .program tmsWrite
